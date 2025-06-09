@@ -119,9 +119,8 @@ export default function AvattaliPage() {
                 <button
                   key={index}
                   onClick={() => setSelectedImage(index)}
-                  className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
-                    selectedImage === index ? "border-green-500" : "border-gray-200"
-                  }`}
+                  className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${selectedImage === index ? "border-green-500" : "border-gray-200"
+                    }`}
                 >
                   <img
                     src={image || "/placeholder.svg"}
@@ -258,21 +257,24 @@ export default function AvattaliPage() {
         </div>
       </section>
 
-      {/* Map Section */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">Nuestra Ubicación</h2>
-          <div className="max-w-4xl mx-auto">
-            <div className="bg-gray-200 h-96 rounded-lg flex items-center justify-center">
-              <div className="text-center">
-                <MapPin className="w-12 h-12 text-gray-500 mx-auto mb-4" />
-                <p className="text-gray-600 text-lg">Aquí se insertará el mapa de Google Maps</p>
-                <p className="text-sm text-gray-500 mt-2">Proporciona la dirección exacta para integrar el mapa</p>
-              </div>
-            </div>
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
+            Nuestra Ubicación
+          </h2>
+
+          <div className="relative overflow-hidden rounded-lg shadow-lg h-96">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1879.0480506906329!2d-99.11376510000005!3d19.623188799999994!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1f6a7fe6af3e9%3A0x59ac38ddb516976!2savattali!5e0!3m2!1ses!2smx!4v1749506985872!5m2!1ses!2smx"
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              className="absolute inset-0 w-full h-full border-0"
+            />
           </div>
         </div>
       </section>
+
 
       {/* Contact Section */}
       <section id="contacto" className="py-16 bg-white">
