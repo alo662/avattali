@@ -92,3 +92,20 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes marquee {
+  0%   { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+.marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 30s linear infinite;
+  align-items: flex-start;    /* ← fuerza a que todos queden alineados arriba */
+}
+
+
+.marquee__group {
+  display: flex;
+}
