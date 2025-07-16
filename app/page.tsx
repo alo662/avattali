@@ -27,6 +27,7 @@ interface Product {
 export default function AvattaliPage() {
   const [currentProductIndex, setCurrentProductIndex] = useState(0)
   const [scrollProgress, setScrollProgress] = useState(0)
+  const [isFading, setIsFading] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -59,17 +60,25 @@ export default function AvattaliPage() {
   ]
 
   const nextProduct = () => {
-    setCurrentProductIndex((prev) => {
-      const nextIndex = prev + 4
-      return nextIndex >= products.length ? 0 : nextIndex
-    })
+    setIsFading(true)
+    setTimeout(() => {
+      setCurrentProductIndex((prev) => {
+        const nextIndex = prev + 4
+        return nextIndex >= products.length ? 0 : nextIndex
+      })
+      setIsFading(false)
+    }, 300)
   }
 
   const prevProduct = () => {
-    setCurrentProductIndex((prev) => {
-      const prevIndex = prev - 4
-      return prevIndex < 0 ? Math.max(0, products.length - 4) : prevIndex
-    })
+    setIsFading(true)
+    setTimeout(() => {
+      setCurrentProductIndex((prev) => {
+        const prevIndex = prev - 4
+        return prevIndex < 0 ? Math.max(0, products.length - 4) : prevIndex
+      })
+      setIsFading(false)
+    }, 300)
   }
 
   const products: Product[] = [
@@ -419,7 +428,7 @@ Ideal para empacar:
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8">Empresa Mexicana</h2>
             <p className="text-lg text-gray-700 mb-8 leading-relaxed">
-              Más de 25 años, AVATTALI es conocida en toda la república mexicana como fabricante de redes tejidas para
+              Más de 25 años, AVATTALI es conocida en toda La República mexicana como fabricante de redes tejidas para
               empaque de todo tipo de productos.
             </p>
             <div className="grid md:grid-cols-3 gap-8">
@@ -430,7 +439,7 @@ Ideal para empacar:
               </div>
               <div className="text-center">
                 <Truck className="w-12 h-12 text-green-600 mx-auto mb-4" />
-                <h3 className="font-semibold text-gray-900 mb-2">importación</h3>
+                <h3 className="font-semibold text-gray-900 mb-2">Importación</h3>
                 <p className="text-gray-600">Maquinaria
                   Enmalladoras C-PACK
                   e INTERMAS</p>
@@ -508,7 +517,7 @@ Ideal para empacar:
             </div>
 
             {/* Products Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 transition-opacity duration-500 ease-in-out ${isFading ? 'opacity-0' : 'opacity-100'}`}>
               {products.slice(currentProductIndex, currentProductIndex + 4).map((product, index) => (
                 <div key={product.id} className="flex-shrink-0">
                   <Dialog>
@@ -714,6 +723,13 @@ Ideal para empacar:
                   <Instagram className="w-6 h-6" />
                   <span>Instagram</span>
                 </a>
+                <a
+                  href="mailto:avattali.mxcontacto@gmail.com"
+                  className="flex items-center space-x-2 text-green-700 hover:text-green-900"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 4h16v16H4V4zm0 0l8 8m0 0l8-8m-8 8v8" /></svg>
+                  <span>Email</span>
+                </a>
               </div>
             </div>
           </div>
@@ -798,6 +814,12 @@ Ideal para empacar:
                   className="text-gray-400 hover:text-pink-400 transition-colors"
                 >
                   <Instagram className="w-5 h-5" />
+                </a>
+                <a
+                  href="mailto:avattali.mxcontacto@gmail.com"
+                  className="text-gray-400 hover:text-green-400 transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 4h16v16H4V4zm0 0l8 8m0 0l8-8m-8 8v8" /></svg>
                 </a>
               </div>
             </div>
