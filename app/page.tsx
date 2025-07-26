@@ -28,6 +28,9 @@ export default function AvattaliPage() {
   const [currentProductIndex, setCurrentProductIndex] = useState(0)
   const [scrollProgress, setScrollProgress] = useState(0)
   const [isFading, setIsFading] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+  const [touchStart, setTouchStart] = useState(0)
+  const [touchEnd, setTouchEnd] = useState(0)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -38,6 +41,16 @@ export default function AvattaliPage() {
 
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
   const scrollToSection = (sectionId: string) => {
@@ -63,7 +76,8 @@ export default function AvattaliPage() {
     setIsFading(true)
     setTimeout(() => {
       setCurrentProductIndex((prev) => {
-        const nextIndex = prev + 4
+        const step = isMobile ? 1 : 4
+        const nextIndex = prev + step
         return nextIndex >= products.length ? 0 : nextIndex
       })
       setIsFading(false)
@@ -74,11 +88,36 @@ export default function AvattaliPage() {
     setIsFading(true)
     setTimeout(() => {
       setCurrentProductIndex((prev) => {
-        const prevIndex = prev - 4
-        return prevIndex < 0 ? Math.max(0, products.length - 4) : prevIndex
+        const step = isMobile ? 1 : 4
+        const prevIndex = prev - step
+        return prevIndex < 0 ? Math.max(0, products.length - step) : prevIndex
       })
       setIsFading(false)
     }, 300)
+  }
+
+  // Touch handlers for mobile swipe
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(0)
+    setTouchStart(e.targetTouches[0].clientX)
+  }
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX)
+  }
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return
+    const distance = touchStart - touchEnd
+    const isLeftSwipe = distance > 50
+    const isRightSwipe = distance < -50
+
+    if (isLeftSwipe) {
+      nextProduct()
+    }
+    if (isRightSwipe) {
+      prevProduct()
+    }
   }
 
   const products: Product[] = [
@@ -386,32 +425,39 @@ Ideal para empacar:
               Contacto
             </button>
           </nav>
+          
+          {/* Mobile Menu Button */}
+          <button className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
         </div>
       </header>
 
       {/* Hero Section */}
       <section
         id="inicio"
-        className="relative bg-cover bg-center min-h-[44rem]"
+        className="relative bg-cover bg-center bg-no-repeat min-h-[44rem]"
         style={{ backgroundImage: "url('/banner.png')" }}
       >
-        {/* Overlay para opacidad */}
-        <div className="absolute inset-0 bg-black/20 z-0"></div>
+        {/* Overlay para opacidad - temporalmente comentado para debug */}
+        {/* <div className="absolute inset-0 bg-black/20 z-0"></div> */}
 
         {/* Texto AVATTALI abajo a la izquierda */}
-        <div className="absolute bottom-8 left-8 z-10">
-          <h1 className="text-4xl md:text-6xl font-bold text-white">AVATTALI</h1>
+        <div className="absolute bottom-4 left-4 md:bottom-8 md:left-8 z-10">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white">AVATTALI</h1>
           {/* Enlaces debajo */}
-          <div className="mt-4 flex space-x-6">
+          <div className="mt-2 md:mt-4 flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-6">
             <button
               onClick={() => scrollToSection('productos')}
-              className="text-xl text-white font-medium underline hover:text-green-200 transition-all duration-300 hover:scale-105"
+              className="text-lg md:text-xl text-white font-medium underline hover:text-green-200 transition-all duration-300 hover:scale-105"
             >
               Productos
             </button>
             <button
               onClick={() => scrollToSection('contacto')}
-              className="text-xl text-white font-medium underline hover:text-green-200 transition-all duration-300 hover:scale-105"
+              className="text-lg md:text-xl text-white font-medium underline hover:text-green-200 transition-all duration-300 hover:scale-105"
             >
               Contactar
             </button>
@@ -481,6 +527,42 @@ Ideal para empacar:
         ::-webkit-scrollbar-thumb:hover {
           background: #059669;
         }
+        
+        /* Mobile dialog improvements */
+        @media (max-width: 640px) {
+          [data-radix-dialog-content] {
+            margin: 1rem;
+            max-height: calc(100vh - 2rem);
+          }
+        }
+        
+        /* Custom scrollbar for modal content */
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: #f1f5f9;
+          border-radius: 3px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #10b981;
+          border-radius: 3px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: #059669;
+        }
+        
+        /* Hide scrollbar for modal */
+        .scrollbar-hide {
+          -ms-overflow-style: none;  /* Internet Explorer 10+ */
+          scrollbar-width: none;  /* Firefox */
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;  /* Safari and Chrome */
+        }
       `}</style>
 
       {/* Products Section */}
@@ -492,50 +574,55 @@ Ideal para empacar:
 
           <div className="max-w-6xl mx-auto">
             {/* Navigation Controls */}
-            <div className="flex justify-between items-center mb-8">
+            <div className="flex justify-between items-center mb-6 md:mb-8">
               <button
                 onClick={prevProduct}
-                className="bg-white hover:bg-gray-50 border border-gray-200 rounded-full p-3 shadow-md transition-all duration-200 hover:scale-105"
+                className="bg-white hover:bg-gray-50 border border-gray-200 rounded-full p-2 md:p-3 shadow-md transition-all duration-200 hover:scale-105"
                 aria-label="Productos anteriores"
               >
-                <ChevronLeft className="w-6 h-6 text-gray-700" />
+                <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 text-gray-700" />
               </button>
               
-              <div className="text-center">
-                <span className="text-lg font-medium text-gray-700">
-                  Productos {currentProductIndex + 1}-{Math.min(currentProductIndex + 4, products.length)} de {products.length}
+              <div className="text-center px-2">
+                <span className="text-sm md:text-lg font-medium text-gray-700">
+                  Producto {currentProductIndex + 1} de {products.length}
                 </span>
               </div>
 
               <button
                 onClick={nextProduct}
-                className="bg-white hover:bg-gray-50 border border-gray-200 rounded-full p-3 shadow-md transition-all duration-200 hover:scale-105"
+                className="bg-white hover:bg-gray-50 border border-gray-200 rounded-full p-2 md:p-3 shadow-md transition-all duration-200 hover:scale-105"
                 aria-label="Siguientes productos"
               >
-                <ChevronRight className="w-6 h-6 text-gray-700" />
+                <ChevronRight className="w-5 h-5 md:w-6 md:h-6 text-gray-700" />
               </button>
             </div>
 
             {/* Products Grid */}
-            <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 transition-opacity duration-500 ease-in-out ${isFading ? 'opacity-0' : 'opacity-100'}`}>
-              {products.slice(currentProductIndex, currentProductIndex + 4).map((product, index) => (
+            <div 
+              className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 transition-opacity duration-500 ease-in-out ${isFading ? 'opacity-0' : 'opacity-100'}`}
+              onTouchStart={onTouchStart}
+              onTouchMove={onTouchMove}
+              onTouchEnd={onTouchEnd}
+            >
+              {products.slice(currentProductIndex, currentProductIndex + (isMobile ? 1 : 4)).map((product, index) => (
                 <div key={product.id} className="flex-shrink-0">
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Card className="h-[28rem] flex flex-col cursor-pointer hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+                      <Card className="h-auto min-h-[24rem] md:h-[28rem] flex flex-col cursor-pointer hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
                         <CardHeader className="p-0 flex-shrink-0">
                           <img
                             src={product.image}
                             alt={product.title}
-                            className="w-full h-48 object-cover rounded-t-lg"
+                            className="w-full h-40 sm:h-48 object-contain bg-gray-100 rounded-t-lg"
                           />
                         </CardHeader>
-                        <CardContent className="p-6">
-                          <CardTitle className="text-lg mb-2 text-gray-900">{product.title}</CardTitle>
-                          <CardDescription className="text-sm text-gray-600">
+                        <CardContent className="p-4 md:p-6 flex-1">
+                          <CardTitle className="text-base md:text-lg mb-2 text-gray-900 line-clamp-2">{product.title}</CardTitle>
+                          <CardDescription className="text-xs md:text-sm text-gray-600 line-clamp-3">
                             {product.description}
                           </CardDescription>
-                          <div className="mt-4">
+                          <div className="mt-3 md:mt-4">
                             <Badge variant="secondary" className="text-xs">
                               Ver detalles
                             </Badge>
@@ -543,70 +630,71 @@ Ideal para empacar:
                         </CardContent>
                       </Card>
                     </DialogTrigger>
-                    <DialogContent className="max-w-5xl max-h-[95vh] overflow-y-auto">
-                      <DialogHeader>
-                        <DialogTitle className="text-3xl font-bold text-gray-900 mb-2">
+                    <DialogContent className="max-w-5xl max-h-[95vh] overflow-y-auto p-4 sm:p-6 scrollbar-hide">
+                      <DialogHeader className="mb-6 pr-8">
+                        <DialogTitle className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
                           {product.title}
                         </DialogTitle>
-                        <DialogDescription className="text-xl text-gray-700 leading-relaxed">
+                        <DialogDescription className="text-base sm:text-lg text-gray-600 leading-relaxed">
                           {product.description}
                         </DialogDescription>
                       </DialogHeader>
                       
-                      <div className="grid lg:grid-cols-2 gap-8 mt-8">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+                        {/* Columna izquierda - Imagen */}
                         <div className="space-y-4">
-                          <div className="relative">
-                            <img
-                              src={product.image}
-                              alt={product.title}
-                              className="w-full h-80 object-cover rounded-xl shadow-lg"
-                            />
-                            <div className="absolute top-4 right-4">
-                              <Badge variant="secondary" className="bg-white/90 text-gray-800 font-medium">
-                                Producto {product.id}
-                              </Badge>
+                          <div className="bg-white rounded-xl border border-gray-200 p-4">
+                            <div className="relative">
+                              <img
+                                src={product.image}
+                                alt={product.title}
+                                className="w-full h-48 sm:h-64 lg:h-80 object-contain bg-gray-50 rounded-lg"
+                              />
+                              <div className="absolute top-2 right-2">
+                                <Badge className="bg-green-600 text-white text-xs font-semibold">
+                                  AVATTALI
+                                </Badge>
+                              </div>
                             </div>
                           </div>
                           
-                          <div className="flex flex-wrap gap-2">
-                            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 font-medium">
-                              Producto AVATTALI
-                            </Badge>
-                            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 font-medium">
-                              Calidad Garantizada
-                            </Badge>
-                            <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 font-medium">
-                              Made in Mexico
-                            </Badge>
-                          </div>
                         </div>
                         
+                        {/* Columna derecha - Información */}
                         <div className="space-y-6">
-                          <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-6 rounded-xl border border-gray-200">
-                            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                              <span className="w-2 h-2 bg-green-500 rounded-full mr-3"></span>
-                              Información Detallada
-                            </h3>
-                            <div className="text-base text-gray-700 leading-relaxed whitespace-pre-line font-medium">
+                          {/* Especificaciones técnicas */}
+                          <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                            <div className="flex items-center mb-4">
+                              <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center mr-3">
+                                <Star className="w-3 h-3 text-white" />
+                              </div>
+                              <h3 className="text-lg font-bold text-gray-900">Especificaciones Técnicas</h3>
+                            </div>
+                            <div className="text-sm sm:text-base text-gray-700 leading-relaxed whitespace-pre-line max-h-80 overflow-y-auto custom-scrollbar">
                               {product.details}
                             </div>
                           </div>
                           
-                          <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                            <div className="flex items-center justify-between">
-                              <div className="text-green-800 font-medium">
+                          {/* Sección de contacto */}
+                          <div className="bg-green-50 rounded-xl p-5 border border-green-200">
+                            <div className="text-center">
+                              <h3 className="text-lg font-bold text-gray-900 mb-3">
                                 ¿Interesado en este producto?
-                              </div>
+                              </h3>
+                              <p className="text-gray-600 mb-4 text-sm">
+                                Contáctanos por WhatsApp para más información y cotizaciones
+                              </p>
                               <Button 
                                 onClick={() => window.open("https://wa.link/vqfajc", "_blank")}
-                                className="bg-green-600 hover:bg-green-700 text-white font-medium"
+                                className="bg-green-600 hover:bg-green-700 text-white font-medium w-full sm:w-auto"
                                 size="lg"
                               >
-                                <MessageCircle className="w-5 h-5 mr-2" />
+                                <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
                                 Consultar por WhatsApp
                               </Button>
                             </div>
                           </div>
+                          
                         </div>
                       </div>
                     </DialogContent>
@@ -617,19 +705,32 @@ Ideal para empacar:
 
             {/* Product Indicators */}
             <div className="flex justify-center mt-8 space-x-2">
-              {Array.from({ length: Math.ceil(products.length / 4) }, (_, index) => (
+              {Array.from({ length: products.length }, (_, index) => (
                 <button
                   key={index}
-                  onClick={() => setCurrentProductIndex(index * 4)}
-                  className={`w-3 h-3 rounded-full transition-all duration-200 ${
-                    Math.floor(currentProductIndex / 4) === index
+                  onClick={() => {
+                    setIsFading(true)
+                    setTimeout(() => {
+                      setCurrentProductIndex(index)
+                      setIsFading(false)
+                    }, 300)
+                  }}
+                  className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-200 ${
+                    currentProductIndex === index
                       ? 'bg-green-600 scale-125'
                       : 'bg-gray-300 hover:bg-gray-400'
                   }`}
-                  aria-label={`Ir a página ${index + 1}`}
+                  aria-label={`Ir al producto ${index + 1}`}
                 />
               ))}
             </div>
+            
+            {/* Mobile Swipe Indicator */}
+            {isMobile && (
+              <div className="text-center mt-4 text-sm text-gray-500">
+                <span>Desliza para navegar</span>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -704,12 +805,12 @@ Ideal para empacar:
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">Contacto</h2>
           <div className="max-w-2xl mx-auto text-center">
             <div className="space-y-6">
-              <div className="flex items-center justify-center space-x-6">
+              <div className="flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-6">
                 <a
                   href="https://www.facebook.com/AvattaliMX/?locale=es_LA"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center space-x-2 text-blue-600 hover:text-blue-700"
+                  className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 text-lg"
                 >
                   <Facebook className="w-6 h-6" />
                   <span>Facebook</span>
@@ -718,14 +819,14 @@ Ideal para empacar:
                   href="https://www.instagram.com/avattali.mx/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center space-x-2 text-pink-600 hover:text-pink-700"
+                  className="flex items-center space-x-2 text-pink-600 hover:text-pink-700 text-lg"
                 >
                   <Instagram className="w-6 h-6" />
                   <span>Instagram</span>
                 </a>
                 <a
                   href="mailto:avattali.mxcontacto@gmail.com"
-                  className="flex items-center space-x-2 text-green-700 hover:text-green-900"
+                  className="flex items-center space-x-2 text-green-700 hover:text-green-900 text-lg"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 4h16v16H4V4zm0 0l8 8m0 0l8-8m-8 8v8" /></svg>
                   <span>Email</span>
@@ -738,21 +839,21 @@ Ideal para empacar:
 
       {/* Back to Top Button */}
       {scrollProgress > 20 && (
-        <div className="fixed bottom-6 left-6 z-50">
+        <div className="fixed bottom-4 left-4 md:bottom-6 md:left-6 z-50">
           <Button
             size="lg"
             variant="outline"
-            className="bg-white/90 hover:bg-white border-gray-200 rounded-full p-3 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
+            className="bg-white/90 hover:bg-white border-gray-200 rounded-full p-2 md:p-3 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             aria-label="Volver arriba"
           >
-            <ArrowUp className="w-6 h-6 text-gray-700" />
+            <ArrowUp className="w-5 h-5 md:w-6 md:h-6 text-gray-700" />
           </Button>
         </div>
       )}
 
       {/* WhatsApp Floating Button */}
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50">
         <div className="relative group">
           {/* Efecto de ondas */}
           <div className="absolute inset-0 bg-green-400 rounded-full animate-ping opacity-75"></div>
@@ -760,11 +861,11 @@ Ideal para empacar:
 
           <Button
             size="lg"
-            className="relative bg-gradient-to-r from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 text-white rounded-full p-6 shadow-2xl transform hover:scale-110 transition-all duration-300 border-4 border-white"
+            className="relative bg-gradient-to-r from-green-400 to-green-600 hover:from-green-500 hover:to-green-700 text-white rounded-full p-4 md:p-6 shadow-2xl transform hover:scale-110 transition-all duration-300 border-4 border-white"
             onClick={() => window.open("https://wa.link/vqfajc", "_blank")}
           >
             <div className="flex flex-col items-center">
-              <MessageCircle className="w-10 h-10 mb-1" />
+              <MessageCircle className="w-8 h-8 md:w-10 md:h-10 mb-1" />
               <span className="text-xs font-bold">WhatsApp</span>
             </div>
           </Button>
