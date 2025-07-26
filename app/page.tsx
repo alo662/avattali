@@ -11,9 +11,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogClose,
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
-import { MapPin, Facebook, Instagram, MessageCircle, Star, Shield, Leaf, Factory, Truck, ChevronLeft, ChevronRight, ArrowUp } from "lucide-react"
+import { MapPin, Facebook, Instagram, MessageCircle, Star, Shield, Leaf, Factory, Truck, ChevronLeft, ChevronRight, ArrowUp, X } from "lucide-react"
 import useEmblaCarousel from "embla-carousel-react"
 
 interface Product {
@@ -438,7 +439,7 @@ Ideal para empacar:
       {/* Hero Section */}
       <section
         id="inicio"
-        className="relative bg-cover bg-center bg-no-repeat min-h-[44rem]"
+        className="relative bg-cover bg-center bg-no-repeat min-h-60 sm:min-h-[44rem] flex items-center justify-center"
         style={{ backgroundImage: "url('/banner.png')" }}
       >
         {/* Overlay para opacidad - temporalmente comentado para debug */}
@@ -583,11 +584,6 @@ Ideal para empacar:
                 <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 text-gray-700" />
               </button>
               
-              <div className="text-center px-2">
-                <span className="text-sm md:text-lg font-medium text-gray-700">
-                  Producto {currentProductIndex + 1} de {products.length}
-                </span>
-              </div>
 
               <button
                 onClick={nextProduct}
@@ -697,6 +693,15 @@ Ideal para empacar:
                           
                         </div>
                       </div>
+                      <DialogClose asChild>
+                        <button
+                          className="fixed top-4 right-4 sm:top-6 sm:right-6 z-50 bg-white/90 rounded-full p-3 shadow-lg focus:outline-none"
+                          style={{ WebkitTapHighlightColor: 'transparent' }}
+                          aria-label="Cerrar"
+                        >
+                          <X className="w-6 h-6 text-gray-700" />
+                        </button>
+                      </DialogClose>
                     </DialogContent>
                   </Dialog>
                 </div>
@@ -836,21 +841,6 @@ Ideal para empacar:
           </div>
         </div>
       </section>
-
-      {/* Back to Top Button */}
-      {scrollProgress > 20 && (
-        <div className="fixed bottom-4 left-4 md:bottom-6 md:left-6 z-50">
-          <Button
-            size="lg"
-            variant="outline"
-            className="bg-white/90 hover:bg-white border-gray-200 rounded-full p-2 md:p-3 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            aria-label="Volver arriba"
-          >
-            <ArrowUp className="w-5 h-5 md:w-6 md:h-6 text-gray-700" />
-          </Button>
-        </div>
-      )}
 
       {/* WhatsApp Floating Button */}
       <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50">
