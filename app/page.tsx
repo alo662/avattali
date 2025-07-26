@@ -564,14 +564,44 @@ Ideal para empacar:
         .scrollbar-hide::-webkit-scrollbar {
           display: none;  /* Safari and Chrome */
         }
+
+        /* Hide default Dialog close button */
+        [data-radix-dialog-content] > button[aria-label="Close"] {
+          display: none !important;
+        }
+
+        /* Hide any other close buttons in the dialog */
+        [data-radix-dialog-content] button[aria-label="Close"],
+        [data-radix-dialog-content] button[data-radix-dialog-close],
+        [data-radix-dialog-content] [role="button"][aria-label="Close"] {
+          display: none !important;
+        }
+
+        /* Hide any X icons that might be showing */
+        [data-radix-dialog-content] svg[data-lucide="x"],
+        [data-radix-dialog-content] .lucide-x {
+          display: none !important;
+        }
+
+        /* Hide ALL default Dialog close buttons and X icons */
+        [data-radix-dialog-content] > button[aria-label="Close"],
+        [data-radix-dialog-content] button[aria-label="Close"],
+        [data-radix-dialog-content] button[data-radix-dialog-close],
+        [data-radix-dialog-content] [role="button"][aria-label="Close"],
+        [data-radix-dialog-content] svg[data-lucide="x"],
+        [data-radix-dialog-content] .lucide-x,
+        [data-radix-dialog-content] button:has(svg[data-lucide="x"]),
+        [data-radix-dialog-content] button:has(.lucide-x) {
+          display: none !important;
+          visibility: hidden !important;
+          opacity: 0 !important;
+          pointer-events: none !important;
+        }
       `}</style>
 
       {/* Products Section */}
       <section id="productos" className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">
-            Nuestros Productos
-          </h2>
 
           <div className="max-w-6xl mx-auto">
             {/* Navigation Controls */}
@@ -584,6 +614,12 @@ Ideal para empacar:
                 <ChevronLeft className="w-5 h-5 md:w-6 md:h-6 text-gray-700" />
               </button>
               
+              {/* Cambiar el contador por "Nuestros Productos": */}
+              <div className="text-center px-4">
+                <span className="text-2xl md:text-3xl font-bold text-gray-900">
+                  Nuestros Productos
+                </span>
+              </div>
 
               <button
                 onClick={nextProduct}
@@ -603,31 +639,31 @@ Ideal para empacar:
             >
               {products.slice(currentProductIndex, currentProductIndex + (isMobile ? 1 : 4)).map((product, index) => (
                 <div key={product.id} className="flex-shrink-0">
-                  <Dialog>
-                    <DialogTrigger asChild>
+                    <Dialog>
+                      <DialogTrigger asChild>
                       <Card className="h-auto min-h-[24rem] md:h-[28rem] flex flex-col cursor-pointer hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
-                        <CardHeader className="p-0 flex-shrink-0">
-                          <img
-                            src={product.image}
-                            alt={product.title}
+                          <CardHeader className="p-0 flex-shrink-0">
+                            <img
+                              src={product.image}
+                              alt={product.title}
                             className="w-full h-40 sm:h-48 object-contain bg-gray-100 rounded-t-lg"
-                          />
-                        </CardHeader>
+                            />
+                          </CardHeader>
                         <CardContent className="p-4 md:p-6 flex-1">
                           <CardTitle className="text-base md:text-lg mb-2 text-gray-900 line-clamp-2">{product.title}</CardTitle>
                           <CardDescription className="text-xs md:text-sm text-gray-600 line-clamp-3">
-                            {product.description}
-                          </CardDescription>
+                              {product.description}
+                            </CardDescription>
                           <div className="mt-3 md:mt-4">
                             <Badge variant="secondary" className="text-xs">
                               Ver detalles
                             </Badge>
                           </div>
-                        </CardContent>
-                      </Card>
-                    </DialogTrigger>
+                          </CardContent>
+                        </Card>
+                      </DialogTrigger>
                     <DialogContent className="max-w-5xl max-h-[95vh] overflow-y-auto p-4 sm:p-6 scrollbar-hide">
-                      <DialogHeader className="mb-6 pr-8">
+                      <DialogHeader className="mb-6 pr-12 pt-12 sm:pr-16 sm:pt-16">
                         <DialogTitle className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
                           {product.title}
                         </DialogTitle>
@@ -695,7 +731,7 @@ Ideal para empacar:
                       </div>
                       <DialogClose asChild>
                         <button
-                          className="fixed top-4 right-4 sm:top-6 sm:right-6 z-50 bg-white/90 rounded-full p-3 shadow-lg focus:outline-none"
+                          className="absolute top-2 right-2 sm:top-4 sm:right-4 z-50 bg-white/90 rounded-full p-3 shadow-lg focus:outline-none"
                           style={{ WebkitTapHighlightColor: 'transparent' }}
                           aria-label="Cerrar"
                         >
@@ -703,9 +739,9 @@ Ideal para empacar:
                         </button>
                       </DialogClose>
                     </DialogContent>
-                  </Dialog>
-                </div>
-              ))}
+                    </Dialog>
+                  </div>
+                ))}
             </div>
 
             {/* Product Indicators */}
